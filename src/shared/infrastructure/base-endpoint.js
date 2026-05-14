@@ -6,7 +6,7 @@
  */
 export class BaseEndpoint {
     /**
-     * @param {import('./base-api.js').BaseApi} baseApi
+     * @param {import('@/shared/infrastructure/base-api.js').BaseApi} baseApi
      * @param {string} endpointPath p.ej. "/api/stands"
      */
     constructor(baseApi, endpointPath) {
