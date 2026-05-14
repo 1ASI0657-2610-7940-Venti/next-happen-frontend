@@ -1,14 +1,13 @@
 // --- Rutas de Organizer / Emprendedor ---
 import Home from '@/modules/events/presentation/Home.vue'
 import Entrepreneur from '@/modules/metrics/presentation/entrepreneur-metrics.vue'
-import StandsList from '@/modules/stands/presentation/stands-list.vue'
-import StandForm from '@/modules/stands/presentation/stand-form.vue'
-import Notifications from '@/modules/notifications/presentation/Notifications.vue'
-import Profile from '@/modules/iam/presentation/Profile.vue'
-
 // --- Lazy load de Organizer Pages ---
 const CreateEvent = () => import('@/modules/organizer/presentation/create-event.vue')
 const Events = () => import('@/modules/organizer/presentation/events.vue')
+const StandsList = () => import('@/modules/stands/presentation/stands-list.vue')
+const StandForm = () => import('@/modules/stands/presentation/stand-form.vue')
+const Notifications = () => import('@/modules/notifications/presentation/Notifications.vue')
+const Profile = () => import('@/modules/iam/presentation/Profile.vue')
 
 export default [
     { path: '/org/entrepreneur', name: 'org-entrepreneur', component: Entrepreneur, meta: { requiresAuth: true, role: "Organizer" } },
