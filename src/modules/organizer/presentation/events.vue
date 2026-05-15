@@ -197,7 +197,7 @@ const toast = useToast();
 /* ============================================
    API BACKEND (.NET)
 =============================================== */
-const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5022"}/api/manage/events`;
+const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5022"}/api/events`;
 
 /* ============================================
    STATES
