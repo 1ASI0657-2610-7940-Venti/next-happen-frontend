@@ -140,7 +140,7 @@ async function registerUser() {
     });
 
     // Guardar token y rol real
-    const token = loginRes.data.accessToken;
+    const token = loginRes.data.token;
     const decoded = jwtDecode(token);
     const userId = decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
 

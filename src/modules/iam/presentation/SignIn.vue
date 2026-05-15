@@ -119,7 +119,7 @@ async function loginUser() {
     }
 
     const res = await loginUserService(payload)
-    const token = res.data.accessToken
+    const token = res.data.token
 
     // Decodificar token correctamente
     const decoded = jwtDecode(token)
