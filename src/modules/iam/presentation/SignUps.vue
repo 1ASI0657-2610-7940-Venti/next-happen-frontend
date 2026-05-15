@@ -16,6 +16,7 @@
         <p class="user-type-title">{{ t('signup.userTypeTitle') }}</p>
         <div class="user-type-buttons">
           <button
+            type="button"
             class="user-type-btn"
             :class="{ active: userType === 'user' }"
             @click="userType = 'user'"
@@ -23,6 +24,7 @@
             {{ t('signup.user') }}
           </button>
           <button
+            type="button"
             class="user-type-btn"
             :class="{ active: userType === 'organizer' }"
             @click="userType = 'organizer'"
@@ -86,7 +88,8 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
-import { registerUserService } from "@/modules/iam/infrastructure/auth.api.js";
+import { registerUserService, loginUserService } from "@/modules/iam/infrastructure/auth.api.js";
+import { jwtDecode } from "jwt-decode";
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -127,16 +130,31 @@ async function registerUser() {
       Role: userType.value === "user" ? "User" : "Organizer" 
     };
 
+    // 1. Crear usuario
     await registerUserService(payload);
+
+    // 2. Auto-login para obtener el Token
+    const loginRes = await loginUserService({
+      Email: email.value,
+      Password: password.value
+    });
+
+    // Guardar token y rol real
+    const token = loginRes.data.accessToken;
+    const decoded = jwtDecode(token);
+    const userId = decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("userId", userId);
+    localStorage.setItem("userName", name.value);
+    localStorage.setItem("userType", payload.Role); // Para legacy code si existe
+    localStorage.setItem("role", payload.Role); // Formato correcto usado en el router
 
     loading.value = false;
 
-    // Guardar datos útiles
-    localStorage.setItem("userName", name.value);
-    localStorage.setItem("userType", payload.Role);
-
+    // 3. Redirigir según el rol
     if (payload.Role === "User") router.push("/user/home");
-    else router.push("/org/entrepreneur");
+    else router.push("/org/dashboard");
 
   } catch (err) {
     console.error(err);

@@ -18,6 +18,7 @@
               <p class="user-type-title">{{ t('signin.selectType') }}</p>
               <div class="user-type-buttons">
                 <button
+                  type="button"
                   class="user-type-btn"
                   :class="{ active: userType === 'user' }"
                   @click="userType = 'user'"
@@ -25,6 +26,7 @@
                   {{ t('signin.user') }}
                 </button>
                 <button
+                  type="button"
                   class="user-type-btn"
                   :class="{ active: userType === 'organizer' }"
                   @click="userType = 'organizer'"
