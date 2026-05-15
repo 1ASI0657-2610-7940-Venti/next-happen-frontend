@@ -140,8 +140,20 @@ async function registerUser() {
     });
 
     // Guardar token y rol real
-    const token = loginRes.data.token;
-    const decoded = jwtDecode(token);
+    const token = loginRes.data?.token || loginRes.data?.accessToken || loginRes.data?.Token;
+    console.log("Token recibido del backend:", token);
+    
+    if (!token) {
+        throw new Error("El backend no devolvió un token válido. Respuesta: " + JSON.stringify(loginRes.data));
+    }
+
+    let decoded;
+    try {
+        decoded = jwtDecode(token);
+    } catch (e) {
+        throw new Error("Error decodificando el JWT. Token crudo: " + token);
+    }
+
     const userId = decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
 
     localStorage.setItem("token", token);

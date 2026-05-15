@@ -119,10 +119,20 @@ async function loginUser() {
     }
 
     const res = await loginUserService(payload)
-    const token = res.data.token
+    const token = res.data?.token || res.data?.accessToken || res.data?.Token;
+    console.log("Token recibido en SignIn:", token);
+
+    if (!token) {
+        throw new Error("El backend no devolvió un token. Respuesta: " + JSON.stringify(res.data));
+    }
 
     // Decodificar token correctamente
-    const decoded = jwtDecode(token)
+    let decoded;
+    try {
+        decoded = jwtDecode(token);
+    } catch (e) {
+        throw new Error("Error decodificando JWT en SignIn. Token crudo: " + token);
+    }
 
     // Guardar valores REALES del usuario logueado
     const userRole = decoded.role || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
