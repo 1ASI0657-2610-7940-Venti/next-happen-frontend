@@ -157,7 +157,7 @@
     "name": "Full Name",
     "namePlaceholder": "Enter your name",
     "email": "Email Address",
-    "emailPlaceholder": "your@email.com",
+    "emailPlaceholder": "your{'@'}email.com",
     "password": "Password",
     "passwordPlaceholder": "Minimum 6 characters",
     "create": "Sign Up",

@@ -168,7 +168,7 @@
     "name": "Nombre completo",
     "namePlaceholder": "Ingresa tu nombre",
     "email": "Correo electrónico",
-    "emailPlaceholder": "tu@correo.com",
+    "emailPlaceholder": "tu{'@'}correo.com",
     "password": "Contraseña",
     "passwordPlaceholder": "Mínimo 6 caracteres",
     "create": "Crear cuenta",
