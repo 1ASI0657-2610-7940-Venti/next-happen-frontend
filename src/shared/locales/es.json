@@ -113,6 +113,8 @@
 
   "myFairs": {
     "title": "Mis ferias publicadas",
+    "startDate": "Fecha Inicio",
+    "endDate": "Fecha Fin",
     "columns": {
       "image": "Imagen",
       "org": "Organización",

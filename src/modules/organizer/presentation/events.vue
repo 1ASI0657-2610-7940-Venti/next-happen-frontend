@@ -157,13 +157,25 @@
 
 
         <label>{{ $t('myFairs.columns.date') }}</label>
-        <div class="edit-date">
-          <pv-calendar
-            v-model="selectedFair.dates"
-            selectionMode="range"
-            dateFormat="dd/mm/yy"
-            placeholder="Selecciona las fechas"
-          />
+        <div class="edit-date" style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <div style="flex: 1;">
+            <span style="font-size: 0.8rem; color: #666; display: block; margin-bottom: 4px;">{{ $t('myFairs.startDate') }}</span>
+            <pv-calendar
+              v-model="selectedFair.startDateObj"
+              dateFormat="dd/mm/yy"
+              placeholder="Inicio"
+              style="width: 100%;"
+            />
+          </div>
+          <div style="flex: 1;">
+            <span style="font-size: 0.8rem; color: #666; display: block; margin-bottom: 4px;">{{ $t('myFairs.endDate') }}</span>
+            <pv-calendar
+              v-model="selectedFair.endDateObj"
+              dateFormat="dd/mm/yy"
+              placeholder="Fin"
+              style="width: 100%;"
+            />
+          </div>
         </div>
 
         <label>{{ $t('myFairs.columns.location') }}</label>
@@ -432,9 +444,8 @@ const editFair = (fair) => {
     lng: locData.lng,
     address: locData.address || fair.address || fair.location,
     location: locData.address || fair.location,
-    dates: fair.dateRange?.startDate && fair.dateRange?.endDate
-      ? [new Date(fair.dateRange.startDate), new Date(fair.dateRange.endDate)]
-      : [new Date(), new Date()]
+    startDateObj: fair.dateRange?.startDate ? new Date(fair.dateRange.startDate) : new Date(),
+    endDateObj: fair.dateRange?.endDate ? new Date(fair.dateRange.endDate) : new Date()
   };
 
 
@@ -516,18 +527,20 @@ const saveEdit = async () => {
   try {
     const fair = { ...selectedFair.value };
 
-    if (!fair.dates || fair.dates.length !== 2 || !fair.dates[0] || !fair.dates[1]) {
+    if (!fair.startDateObj || !fair.endDateObj) {
       toast.add({
         severity: "error",
-        summary: "Fechas inválidas",
-        detail: "Debes seleccionar un rango válido.",
+        summary: "Fechas requeridas",
+        detail: "Debes seleccionar fecha de inicio y fin.",
         life: 2500,
       });
       return;
     }
 
-    fair.startDate = fair.dates[0].toISOString();
-    fair.endDate = fair.dates[1].toISOString();
+    fair.startDate = fair.startDateObj.toISOString();
+    fair.endDate = fair.endDateObj.toISOString();
+    delete fair.startDateObj;
+    delete fair.endDateObj;
     delete fair.dates;
 
     // Formatear la ubicación georreferenciada antes de guardar
@@ -623,8 +636,14 @@ const deleteFair = async (fair) => {
    FORMAT DATE RANGE
 =============================================== */
 const formatDateRange = (dates) => {
-  if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) return "";
-  return `${dates[0].toLocaleDateString()} - ${dates[1].toLocaleDateString()}`;
+  if (!dates || !Array.isArray(dates) || dates.length < 2) return "";
+  const d1 = dates[0];
+  const d2 = dates[1];
+  if (!d1 || !d2) return "";
+  const date1 = d1 instanceof Date ? d1 : new Date(d1);
+  const date2 = d2 instanceof Date ? d2 : new Date(d2);
+  if (isNaN(date1.getTime()) || isNaN(date2.getTime())) return "";
+  return `${date1.toLocaleDateString()} - ${date2.toLocaleDateString()}`;
 };
 
 </script>

@@ -35,9 +35,9 @@
     <p class="desc">{{ event.description }}</p>
     <p>
   <strong>Fecha:</strong>
-  {{ new Date(event.startDate).toLocaleDateString() }}
+  {{ event.startDate ? new Date(event.startDate).toLocaleDateString() : '' }}
   -
-  {{ new Date(event.endDate).toLocaleDateString() }}
+  {{ event.endDate ? new Date(event.endDate).toLocaleDateString() : '' }}
 </p>
     <p><strong>Entradas disponibles:</strong> {{ event.quantity }}</p>
     <p><strong>Precio unitario:</strong> S/. {{ event.price }}</p>

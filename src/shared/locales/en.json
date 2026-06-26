@@ -102,6 +102,8 @@
 
   "myFairs": {
     "title": "My Published Fairs",
+    "startDate": "Start Date",
+    "endDate": "End Date",
     "columns": {
       "image": "Image",
       "org": "Organization",
