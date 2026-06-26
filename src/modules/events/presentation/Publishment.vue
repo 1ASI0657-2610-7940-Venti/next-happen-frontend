@@ -93,7 +93,8 @@ const carousel = ref(null)
 let index = 0
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyA63CoEMd84d8bQBolX_gBrmksWBiev_vs";
+
 
 // ==== Tickets ====
 const ticketCount = ref(1)

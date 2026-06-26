@@ -281,7 +281,8 @@ onMounted(loadFairs);
    Google Maps - Edición
  ===================================================== */
 let mapEdit, markerEdit, geocoderEdit;
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyA63CoEMd84d8bQBolX_gBrmksWBiev_vs";
+
 
 const parseLocation = (loc) => {
   if (!loc) return { lat: -12.0464, lng: -77.0428, address: "" };
