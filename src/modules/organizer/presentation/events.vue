@@ -266,9 +266,15 @@ const loadFairs = async () => {
 
     const data = await res.json();
 
-    const currentOrganizer = localStorage.getItem("userName") || localStorage.getItem("userId") || "Organizer";
+    const currentOrganizerId = localStorage.getItem("userId");
+    const currentOrganizerName = localStorage.getItem("userName");
     fairs.value = data
-      .filter(ev => ev.organizer === currentOrganizer || !ev.organizer || ev.organizer === "")
+      .filter(ev => 
+        ev.organizer === currentOrganizerId || 
+        ev.organizer === currentOrganizerName || 
+        !ev.organizer || 
+        ev.organizer === ""
+      )
 
       .map(ev => ({
         ...ev,
