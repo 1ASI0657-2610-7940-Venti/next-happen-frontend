@@ -559,6 +559,8 @@ const saveEdit = async () => {
     delete fair.address;
 
     const token = localStorage.getItem("token");
+    console.log("[EventsModule] API_URL for PUT:", `${API_URL}/${fair.id}`);
+    console.log("[EventsModule] Token for PUT:", token);
     const res = await fetch(`${API_URL}/${fair.id}`, {
       method: "PUT",
       headers: { 
@@ -601,6 +603,8 @@ const deleteFair = async (fair) => {
 
   try {
     const token = localStorage.getItem("token");
+    console.log("[EventsModule] API_URL for DELETE:", `${API_URL}/${fair.id}`);
+    console.log("[EventsModule] Token for DELETE:", token);
     const res = await fetch(`${API_URL}/${fair.id}`, {
       method: "DELETE",
       headers: { 

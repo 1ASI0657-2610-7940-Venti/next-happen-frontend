@@ -421,6 +421,8 @@ const publishEvent = async () => {
 
   try {
     const token = localStorage.getItem("token");
+    console.log("[CreateEvent] API_URL:", API_URL);
+    console.log("[CreateEvent] Token in localStorage:", token);
     const res = await fetch(`${API_URL}/api/events`, {
       method: "POST",
       headers: { 
