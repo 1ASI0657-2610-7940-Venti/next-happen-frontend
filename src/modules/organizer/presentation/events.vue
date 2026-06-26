@@ -257,13 +257,15 @@ const loadFairs = async () => {
     const currentOrganizer = localStorage.getItem("userName") || localStorage.getItem("userId") || "Organizer";
     fairs.value = data
       .filter(ev => ev.organizer === currentOrganizer || !ev.organizer || ev.organizer === "")
+
       .map(ev => ({
         ...ev,
-        dates: [
-          ev.dateRange?.startDate ? new Date(ev.dateRange.startDate) : null,
-          ev.dateRange?.endDate ? new Date(ev.dateRange.endDate) : null
-        ]
+        dates: ev.dateRange?.startDate && ev.dateRange?.endDate
+          ? [new Date(ev.dateRange.startDate), new Date(ev.dateRange.endDate)]
+          : []
       }));
+
+
 
   } catch (err) {
     console.error(err);
@@ -430,11 +432,11 @@ const editFair = (fair) => {
     lng: locData.lng,
     address: locData.address || fair.address || fair.location,
     location: locData.address || fair.location,
-    dates: [
-      fair.dateRange?.startDate ? new Date(fair.dateRange.startDate) : null,
-      fair.dateRange?.endDate ? new Date(fair.dateRange.endDate) : null
-    ]
+    dates: fair.dateRange?.startDate && fair.dateRange?.endDate
+      ? [new Date(fair.dateRange.startDate), new Date(fair.dateRange.endDate)]
+      : [new Date(), new Date()]
   };
+
 
   previewImages.value = [...(selectedFair.value.photos || [])];
   showEditDialog.value = true;
@@ -621,9 +623,10 @@ const deleteFair = async (fair) => {
    FORMAT DATE RANGE
 =============================================== */
 const formatDateRange = (dates) => {
-  if (!dates || dates.length !== 2) return "";
+  if (!dates || dates.length !== 2 || !dates[0] || !dates[1]) return "";
   return `${dates[0].toLocaleDateString()} - ${dates[1].toLocaleDateString()}`;
 };
+
 </script>
 
 <style scoped>

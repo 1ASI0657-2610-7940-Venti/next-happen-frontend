@@ -138,13 +138,25 @@ async function loginUser() {
     // Guardar valores REALES del usuario logueado
     const userRole = decoded.role || decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
     const userId = decoded.id || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+    const userName = decoded.name || decoded.unique_name || decoded.FullName || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] || "Organizer";
+    const userEmail = decoded.email || decoded.Email || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] || "";
 
     localStorage.setItem("token", token)
-    localStorage.setItem("userId", userId)            // <---- IMPORTANTE
-    localStorage.setItem("role", userRole)            // <---- DEL TOKEN
-    localStorage.setItem("userName", decoded.fullName)    // <---- DEL TOKEN
+    localStorage.setItem("userId", userId)
+    localStorage.setItem("role", userRole)
+    localStorage.setItem("userName", userName)
+    localStorage.setItem("userEmail", userEmail)
+
+    // Legacy support
+    localStorage.setItem("user", JSON.stringify({
+      id: userId,
+      name: userName,
+      email: userEmail,
+      role: userRole
+    }))
 
     console.log("UserId guardado:", userId)
+
 
     // Redirección según el tipo de usuario
     if (userRole === "User") {
