@@ -30,7 +30,8 @@ const metricsApi = new MetricsApi()
 const notifications = ref([])
 const events = ref([])
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5022"
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000"
+
 
 /* =====================================================
    Cargar eventos desde el backend real (.NET)

@@ -42,8 +42,16 @@
     <p><strong>Entradas disponibles:</strong> {{ event.quantity }}</p>
     <p><strong>Precio unitario:</strong> S/. {{ event.price }}</p>
 
+    <!-- ==== Ubicación en el Mapa ==== -->
+    <div class="map-section" style="margin-top: 20px; margin-bottom: 20px;">
+      <h3 style="margin-bottom: 8px;">📍 Ubicación del Evento</h3>
+      <p v-if="event.address"><strong>Dirección:</strong> {{ event.address }}</p>
+      <div id="map-publishment" style="height: 300px; border: 2px solid #333; margin-top: 10px; background: #eee;"></div>
+    </div>
+
     <!-- ==== Selector de cantidad ==== -->
     <div class="ticket-section">
+
       <label for="ticketCount"><strong>Cantidad de entradas:</strong></label>
       <div class="ticket-input">
         <button class="btn-qty" @click="decreaseQuantity">−</button>
@@ -84,7 +92,8 @@ const event = ref(null)
 const carousel = ref(null)
 let index = 0
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5022'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
 
 // ==== Tickets ====
 const ticketCount = ref(1)
@@ -98,11 +107,78 @@ function decreaseQuantity() {
   if (ticketCount.value > 1) ticketCount.value--
 }
 
+const parseLocation = (loc) => {
+  if (!loc) return { lat: -12.0464, lng: -77.0428, address: "" };
+  if (loc.includes('|')) {
+    const [coords, address] = loc.split('|');
+    const [lat, lng] = coords.split(',').map(Number);
+    return { lat, lng, address };
+  }
+  return { lat: null, lng: null, address: loc };
+};
+
+const loadGoogleMapsScript = (callback) => {
+  if (window.google?.maps) {
+    callback();
+    return;
+  }
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+  script.async = true;
+  script.defer = true;
+  script.onload = callback;
+  document.head.appendChild(script);
+};
+
+const initPublishmentMap = () => {
+  const element = document.getElementById("map-publishment");
+  if (!element || !event.value) return;
+
+  const locData = parseLocation(event.value.location);
+  const geocoder = new google.maps.Geocoder();
+
+  let center = { lat: -12.0464, lng: -77.0428 };
+  let zoom = 11;
+
+  if (locData.lat && locData.lng) {
+    center = { lat: locData.lat, lng: locData.lng };
+    zoom = 16;
+  }
+
+  const map = new google.maps.Map(element, {
+    center: center,
+    zoom: zoom
+  });
+
+  if (locData.lat && locData.lng) {
+    new google.maps.Marker({
+      position: center,
+      map: map
+    });
+  } else if (locData.address || event.value.address) {
+    const addressToGeocode = locData.address || event.value.address;
+    geocoder.geocode({ address: addressToGeocode }, (results, status) => {
+      if (status === "OK" && results.length > 0) {
+        const loc = results[0].geometry.location;
+        map.setCenter(loc);
+        map.setZoom(16);
+        new google.maps.Marker({
+          position: loc,
+          map: map
+        });
+      }
+    });
+  }
+};
+
 onMounted(async () => {
   const res = await axios.get(`${API_URL}/api/events/${route.params.id}`)
   event.value = res.data
   await nextTick()
   applyTransform()
+  loadGoogleMapsScript(() => {
+    initPublishmentMap();
+  });
 })
 
 function getCardWidth() {

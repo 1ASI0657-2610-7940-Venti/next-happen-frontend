@@ -136,19 +136,19 @@
             :label="$t('createEvent.buttons.search')"
             class="search-button"
             @click="searchAddress"
-            v-show="false"
           />
         </div>
       </div>
 
-      <!-- Mapa (Oculto temporalmente por API vencida) -->
-      <div class="field" v-show="false">
+      <!-- Mapa (Geolocalizado) -->
+      <div class="field">
         <label>{{ $t('createEvent.fields.location') }}</label>
         <div id="map" class="map"></div>
         <small v-if="form.location">
           {{ $t('createEvent.mapMarker') }} {{ form.location }}
         </small>
       </div>
+
 
       <!-- Fechas -->
       <div class="field">
@@ -269,7 +269,8 @@ const { t } = useI18n();
 // URL del backend .NET (Render)
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5022";
+  "http://localhost:5000";
+
 
 /* =====================================================
    Formulario
@@ -329,7 +330,8 @@ const showAddressDialog = ref(false);
    Google Maps
 ===================================================== */
 let map, marker, geocoder;
-const GOOGLE_API_KEY = "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
+
 
 /* =====================================================
    CLOUDINARY CONFIG
@@ -395,6 +397,11 @@ const publishEvent = async () => {
     ? form.value.dates
     : [form.value.dates, form.value.dates];
 
+  const lat = form.value.lat;
+  const lng = form.value.lng;
+  const rawAddress = form.value.address;
+  const locationString = lat && lng ? `${lat},${lng}|${form.value.location || rawAddress}` : (form.value.location || rawAddress);
+
   const newEvent = {
     organizer: form.value.organizer,
     title: form.value.title,
@@ -402,13 +409,14 @@ const publishEvent = async () => {
     price: parseFloat(form.value.price) || null,
     quantity: parseInt(form.value.quantity) || null,
     category: form.value.category?.name || "",
-    address: form.value.address,
-    location: form.value.location || form.value.address,
+    address: rawAddress,
+    location: locationString,
     photos: form.value.photos,
     startDate: new Date(start).toISOString(),
     endDate: new Date(end).toISOString(),
     isPublic: true 
   };
+
 
   try {
     const res = await fetch(`${API_URL}/api/events`, {
@@ -471,6 +479,19 @@ const searchAddress = () => {
       form.value.lat = location.lat();
       form.value.lng = location.lng();
       form.value.location = result.formatted_address;
+
+      // Evento al arrastrar marcador
+      marker.addListener("dragend", () => {
+        const pos = marker.getPosition();
+        form.value.lat = pos.lat();
+        form.value.lng = pos.lng();
+        geocoder.geocode({ location: pos }, (revResults, revStatus) => {
+          if (revStatus === "OK" && revResults.length > 0) {
+            form.value.location = revResults[0].formatted_address;
+            form.value.address = revResults[0].formatted_address;
+          }
+        });
+      });
     } else {
       showAddressDialog.value = true;
     }
@@ -485,6 +506,43 @@ const initMap = () => {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: -12.0464, lng: -77.0428 },
     zoom: 12,
+  });
+
+  // Habilitar clic en el mapa para colocar el marcador directamente
+  map.addListener("click", (e) => {
+    const pos = e.latLng;
+    map.panTo(pos);
+
+    if (marker) marker.setMap(null);
+
+    marker = new google.maps.Marker({
+      position: pos,
+      map,
+      draggable: true,
+    });
+
+    form.value.lat = pos.lat();
+    form.value.lng = pos.lng();
+
+    geocoder.geocode({ location: pos }, (revResults, revStatus) => {
+      if (revStatus === "OK" && revResults.length > 0) {
+        form.value.location = revResults[0].formatted_address;
+        form.value.address = revResults[0].formatted_address;
+      }
+    });
+
+    // Registrar dragend al recrear marcador
+    marker.addListener("dragend", () => {
+      const dragPos = marker.getPosition();
+      form.value.lat = dragPos.lat();
+      form.value.lng = dragPos.lng();
+      geocoder.geocode({ location: dragPos }, (revResults, revStatus) => {
+        if (revStatus === "OK" && revResults.length > 0) {
+          form.value.location = revResults[0].formatted_address;
+          form.value.address = revResults[0].formatted_address;
+        }
+      });
+    });
   });
 };
 

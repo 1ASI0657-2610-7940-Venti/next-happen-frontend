@@ -167,10 +167,19 @@
         </div>
 
         <label>{{ $t('myFairs.columns.location') }}</label>
-        <div class="edit-location">
-          <pv-input-text v-model="selectedFair.location" />
+        <div class="edit-location" style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <pv-input-text v-model="selectedFair.address" placeholder="Ej: Av. Javier Prado 123" style="flex: 1;" />
+          <pv-button icon="pi pi-search" class="p-button-warning" @click="searchEditAddress" />
+        </div>
+
+        <div class="field" style="margin-bottom: 12px;">
+          <div id="map-edit" style="height: 250px; border: 2px solid #333; margin-bottom: 8px; background: #eee;"></div>
+          <small v-if="selectedFair.location" style="display: block; font-weight: bold;">
+            📍 {{ selectedFair.location }}
+          </small>
         </div>
       </div>
+
 
       <template #footer>
 
@@ -186,7 +195,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
+
 import { useToast } from "primevue/usetoast";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
@@ -197,7 +207,8 @@ const toast = useToast();
 /* ============================================
    API BACKEND (.NET)
 =============================================== */
-const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5022"}/api/events`;
+const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/events`;
+
 
 /* ============================================
    STATES
@@ -266,12 +277,157 @@ const loadFairs = async () => {
 
 onMounted(loadFairs);
 
+/* =====================================================
+   Google Maps - Edición
+ ===================================================== */
+let mapEdit, markerEdit, geocoderEdit;
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyDLpIMi-V6G67TcGLcx9Z8ofJp896aYhq0";
+
+const parseLocation = (loc) => {
+  if (!loc) return { lat: -12.0464, lng: -77.0428, address: "" };
+  if (loc.includes('|')) {
+    const [coords, address] = loc.split('|');
+    const [lat, lng] = coords.split(',').map(Number);
+    return { lat, lng, address };
+  }
+  return { lat: null, lng: null, address: loc };
+};
+
+const loadGoogleMapsScript = (callback) => {
+  if (window.google?.maps) {
+    callback();
+    return;
+  }
+  const script = document.createElement("script");
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_API_KEY}&libraries=places`;
+  script.async = true;
+  script.defer = true;
+  script.onload = callback;
+  document.head.appendChild(script);
+};
+
+const setupMarkerEditListeners = () => {
+  if (!markerEdit) return;
+  markerEdit.addListener("dragend", () => {
+    const pos = markerEdit.getPosition();
+    selectedFair.value.lat = pos.lat();
+    selectedFair.value.lng = pos.lng();
+    geocoderEdit.geocode({ location: pos }, (revResults, revStatus) => {
+      if (revStatus === "OK" && revResults.length > 0) {
+        selectedFair.value.location = revResults[0].formatted_address;
+        selectedFair.value.address = revResults[0].formatted_address;
+      }
+    });
+  });
+};
+
+const initEditMap = () => {
+  const element = document.getElementById("map-edit");
+  if (!element) return;
+
+  geocoderEdit = new google.maps.Geocoder();
+
+  let center = { lat: -12.0464, lng: -77.0428 };
+  let zoom = 11;
+
+  if (selectedFair.value.lat && selectedFair.value.lng) {
+    center = { lat: selectedFair.value.lat, lng: selectedFair.value.lng };
+    zoom = 16;
+  }
+
+  mapEdit = new google.maps.Map(element, {
+    center: center,
+    zoom: zoom
+  });
+
+  if (selectedFair.value.lat && selectedFair.value.lng) {
+    markerEdit = new google.maps.Marker({
+      position: center,
+      map: mapEdit,
+      draggable: true
+    });
+    setupMarkerEditListeners();
+  } else if (selectedFair.value.address) {
+    geocoderEdit.geocode({ address: selectedFair.value.address }, (results, status) => {
+      if (status === "OK" && results.length > 0) {
+        const loc = results[0].geometry.location;
+        mapEdit.setCenter(loc);
+        mapEdit.setZoom(16);
+        markerEdit = new google.maps.Marker({
+          position: loc,
+          map: mapEdit,
+          draggable: true
+        });
+        selectedFair.value.lat = loc.lat();
+        selectedFair.value.lng = loc.lng();
+        setupMarkerEditListeners();
+      }
+    });
+  }
+
+  mapEdit.addListener("click", (e) => {
+    const pos = e.latLng;
+    mapEdit.panTo(pos);
+    if (markerEdit) markerEdit.setMap(null);
+    markerEdit = new google.maps.Marker({
+      position: pos,
+      map: mapEdit,
+      draggable: true
+    });
+    selectedFair.value.lat = pos.lat();
+    selectedFair.value.lng = pos.lng();
+
+    geocoderEdit.geocode({ location: pos }, (revResults, revStatus) => {
+      if (revStatus === "OK" && revResults.length > 0) {
+        selectedFair.value.location = revResults[0].formatted_address;
+        selectedFair.value.address = revResults[0].formatted_address;
+      }
+    });
+
+    setupMarkerEditListeners();
+  });
+};
+
+const searchEditAddress = () => {
+  if (!selectedFair.value.address || !geocoderEdit) return;
+  geocoderEdit.geocode({ address: selectedFair.value.address }, (results, status) => {
+    if (status === "OK" && results.length > 0) {
+      const loc = results[0].geometry.location;
+      mapEdit.setCenter(loc);
+      mapEdit.setZoom(17);
+      if (markerEdit) markerEdit.setMap(null);
+      markerEdit = new google.maps.Marker({
+        position: loc,
+        map: mapEdit,
+        draggable: true
+      });
+      selectedFair.value.lat = loc.lat();
+      selectedFair.value.lng = loc.lng();
+      selectedFair.value.location = results[0].formatted_address;
+      setupMarkerEditListeners();
+    } else {
+      toast.add({
+        severity: "warn",
+        summary: "No encontrada",
+        detail: "No se pudo geolocalizar la dirección.",
+        life: 2500
+      });
+    }
+  });
+};
+
 /* ============================================
    OPEN EDIT MODAL — FIXED
-=============================================== */
+ =============================================== */
 const editFair = (fair) => {
+  const locData = parseLocation(fair.location);
+
   selectedFair.value = {
     ...fair,
+    lat: locData.lat,
+    lng: locData.lng,
+    address: locData.address || fair.address || fair.location,
+    location: locData.address || fair.location,
     dates: [
       fair.dateRange?.startDate ? new Date(fair.dateRange.startDate) : null,
       fair.dateRange?.endDate ? new Date(fair.dateRange.endDate) : null
@@ -280,7 +436,14 @@ const editFair = (fair) => {
 
   previewImages.value = [...(selectedFair.value.photos || [])];
   showEditDialog.value = true;
+
+  loadGoogleMapsScript(() => {
+    nextTick(() => {
+      initEditMap();
+    });
+  });
 };
+
 
 /* ============================================
    IMAGE HANDLING
@@ -363,11 +526,27 @@ const saveEdit = async () => {
     fair.endDate = fair.dates[1].toISOString();
     delete fair.dates;
 
+    // Formatear la ubicación georreferenciada antes de guardar
+    const lat = fair.lat;
+    const lng = fair.lng;
+    const address = fair.address;
+    if (lat && lng) {
+      fair.location = `${lat},${lng}|${fair.location || address}`;
+    } else {
+      fair.location = fair.location || address;
+    }
+
+    // Eliminar temporales
+    delete fair.lat;
+    delete fair.lng;
+    delete fair.address;
+
     const res = await fetch(`${API_URL}/${fair.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(fair),
     });
+
 
     if (!res.ok) throw new Error("No se pudo actualizar el evento.");
 
