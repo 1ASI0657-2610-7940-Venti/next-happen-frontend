@@ -548,6 +548,9 @@ const initMap = () => {
 };
 
 onMounted(() => {
+  const currentOrganizer = localStorage.getItem("userName") || localStorage.getItem("userId") || "Organizer";
+  form.value.organizer = currentOrganizer;
+
   nextTick(() => {
     if (!window.google?.maps) {
       const script = document.createElement("script");
@@ -561,6 +564,7 @@ onMounted(() => {
     }
   });
 });
+
 </script>
 
 

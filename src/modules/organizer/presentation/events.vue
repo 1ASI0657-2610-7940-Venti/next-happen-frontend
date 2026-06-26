@@ -254,15 +254,16 @@ const loadFairs = async () => {
 
     const data = await res.json();
 
-    fairs.value = data.map(ev => ({
-
-      
-      ...ev,
-      dates: [
-        ev.dateRange?.startDate ? new Date(ev.dateRange.startDate) : null,
-        ev.dateRange?.endDate ? new Date(ev.dateRange.endDate) : null
-      ]
-    }));
+    const currentOrganizer = localStorage.getItem("userName") || localStorage.getItem("userId") || "Organizer";
+    fairs.value = data
+      .filter(ev => ev.organizer === currentOrganizer || !ev.organizer || ev.organizer === "")
+      .map(ev => ({
+        ...ev,
+        dates: [
+          ev.dateRange?.startDate ? new Date(ev.dateRange.startDate) : null,
+          ev.dateRange?.endDate ? new Date(ev.dateRange.endDate) : null
+        ]
+      }));
 
   } catch (err) {
     console.error(err);

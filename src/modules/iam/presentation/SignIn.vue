@@ -38,12 +38,12 @@
       
             <form @submit.prevent="loginUser" class="signup-form">
               <div class="form-group">
-                <label for="name">{{ t('signin.name') }}</label>
+                <label for="email">{{ t('signup.email') }}</label>
                 <input
-                  id="name"
-                  v-model.trim="name"
-                  type="text"
-                  :placeholder="t('signin.namePlaceholder')"
+                  id="email"
+                  v-model.trim="email"
+                  type="email"
+                  :placeholder="t('signup.emailPlaceholder')"
                   required
                 />
               </div>
@@ -86,7 +86,7 @@ import { jwtDecode } from "jwt-decode"
 const router = useRouter()
 const { t, locale } = useI18n()
 
-const name = ref("")
+const email = ref("")
 const password = ref("")
 const userType = ref("") 
 const loading = ref(false)
@@ -113,10 +113,11 @@ async function loginUser() {
 
   try {
     const payload = {
-      FullName: name.value,
+      Email: email.value,
       Password: password.value,
       Role: userType.value === "user" ? "User" : "Organizer"
     }
+
 
     const res = await loginUserService(payload)
     const token = res.data?.token || res.data?.accessToken || res.data?.Token;
