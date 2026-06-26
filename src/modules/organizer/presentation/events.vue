@@ -542,11 +542,16 @@ const saveEdit = async () => {
     delete fair.lng;
     delete fair.address;
 
+    const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/${fair.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(fair),
     });
+
 
 
     if (!res.ok) throw new Error("No se pudo actualizar el evento.");
@@ -579,9 +584,14 @@ const deleteFair = async (fair) => {
   if (!window.confirm(`¿Eliminar el evento "${fair.title}"?`)) return;
 
   try {
+    const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/${fair.id}`, {
       method: "DELETE",
+      headers: { 
+        "Authorization": `Bearer ${token}`
+      }
     });
+
 
     if (!res.ok && res.status !== 204)
       throw new Error("No se pudo eliminar.");
