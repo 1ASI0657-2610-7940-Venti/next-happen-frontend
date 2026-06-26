@@ -420,9 +420,13 @@ const publishEvent = async () => {
 
 
   try {
+    const token = localStorage.getItem("token");
     const res = await fetch(`${API_URL}/api/events`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(newEvent),
     });
 
