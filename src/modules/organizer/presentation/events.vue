@@ -18,7 +18,11 @@
         </Column>
 
         <!-- Columnas -->
-        <Column field="organizer" :header="$t('myFairs.columns.org')" />
+        <Column field="organizer" :header="$t('myFairs.columns.org')">
+          <template #body="{ data }">
+            <span>{{ displayOrganizer(data.organizer) }}</span>
+          </template>
+        </Column>
         <Column field="title" :header="$t('myFairs.columns.name')" />
         <Column field="price" :header="$t('myFairs.columns.price')" />
         <Column field="quantity" :header="$t('myFairs.columns.quantity')" />
@@ -220,6 +224,15 @@ const toast = useToast();
    API BACKEND (.NET)
 =============================================== */
 const API_URL = `${import.meta.env.VITE_API_URL || (import.meta.env.PROD ? "/proxy" : "http://localhost:5000")}/api/events`;
+
+const displayOrganizer = (org) => {
+  const currentOrganizerId = localStorage.getItem("userId");
+  const currentOrganizerName = localStorage.getItem("userName");
+  if (org === currentOrganizerId && currentOrganizerName) {
+    return currentOrganizerName;
+  }
+  return org || "";
+};
 
 
 /* ============================================
