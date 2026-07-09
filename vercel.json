@@ -1,5 +1,4 @@
 {
-  "//": "IMPORTANT: replace the destination host with your backend behind HTTPS (domain + TLS cert). Vercel does not support env vars in rewrite destinations, so this value is committed — do NOT use a plain-HTTP IP.",
   "rewrites": [
     { "source": "/proxy/(.*)", "destination": "https://api.nexthappen.app/$1" },
     { "source": "/(.*)", "destination": "/" }
