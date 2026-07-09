@@ -269,7 +269,7 @@ const { t } = useI18n();
 // URL del backend .NET (Render)
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  (import.meta.env.PROD ? "/proxy" : "http://localhost:5000");
 
 
 /* =====================================================

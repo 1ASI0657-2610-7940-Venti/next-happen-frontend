@@ -85,7 +85,7 @@ import axios from 'axios'
 import { SalesApi } from '@/modules/tickets/infrastructure/sales-api.js'
 
 const salesApi = new SalesApi()
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 
 const loading = ref(true)
 const rows = ref([])

@@ -95,7 +95,7 @@ const paymentsApi = new PaymentsApi()
 const tickets = ref([])
 const loading = ref(true)
 const refunding = ref(null)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 
 async function load() {
   loading.value = true

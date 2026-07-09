@@ -95,7 +95,7 @@ import axios from 'axios'
 import { PaymentsApi } from '@/modules/tickets/infrastructure/payments-api.js'
 
 const paymentsApi = new PaymentsApi()
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 
 const mode = ref('code')
 
