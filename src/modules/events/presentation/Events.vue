@@ -29,7 +29,7 @@ import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import EventCard from '@/modules/events/presentation/EventCard.vue'
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 const savedEvents = ref([])
 
 const { t } = useI18n()

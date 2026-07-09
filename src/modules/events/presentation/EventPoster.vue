@@ -34,7 +34,7 @@ const props = defineProps({ event: { type: Object, required: true } })
 const router = useRouter()
 const savedStore = useSavedStore()
 const metricsApi = new MetricsApi()
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 
 const isSaved = ref(false)
 

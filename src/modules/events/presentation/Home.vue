@@ -80,7 +80,7 @@ import { ref, computed, onMounted } from 'vue'
 import axios from 'axios'
 import { useSavedStore } from '@/modules/events/application/saved.store.js'
 
-const API = import.meta.env.VITE_API_URL
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 const savedStore = useSavedStore()
 
 const events = ref([])

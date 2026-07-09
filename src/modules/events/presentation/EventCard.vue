@@ -32,7 +32,7 @@ import { useSavedStore } from "@/modules/events/application/saved.store.js"
 import { MetricsApi } from "@/modules/metrics/infrastructure/metrics-api.js"
 import { useRouter } from "vue-router"
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 const router = useRouter()
 const savedStore = useSavedStore()
 const metricsApi = new MetricsApi()

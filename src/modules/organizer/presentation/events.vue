@@ -302,7 +302,7 @@ onMounted(loadFairs);
    Google Maps - Edición
  ===================================================== */
 let mapEdit, markerEdit, geocoderEdit;
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyA63CoEMd84d8bQBolX_gBrmksWBiev_vs";
 
 
 const parseLocation = (loc) => {

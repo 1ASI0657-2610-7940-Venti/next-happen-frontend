@@ -70,9 +70,7 @@ const metrics = ref([])
 const selectedEventId = ref(null)
 const loading = ref(false)
 
-// CORREGIDO: VITE_API_URL debe venir SIN /api
-// Ejemplo correcto: VITE_API_URL="https://nexthappen-back.onrender.com"
-const API = import.meta.env.VITE_API_URL
+const API = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/proxy' : 'http://localhost:5000')
 
 // ================================================
 // Cargar eventos REALES desde tu backend .NET
