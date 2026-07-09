@@ -1,7 +1,7 @@
 <template>
   <div class="publishment-page" v-if="event">
     <h1 class="title">{{ event.title }}</h1>
-    <p><strong>Organizador:</strong> {{ event.organizer }}</p>
+    <p><strong>Organizador:</strong> {{ event.organizerName || event.organizer }}</p>
 
     <!-- ==== Carrusel ==== -->
     <div class="carousel-container">
@@ -185,6 +185,17 @@ const initPublishmentMap = () => {
 onMounted(async () => {
   const res = await axios.get(`${API_URL}/api/events/${route.params.id}`)
   event.value = res.data
+
+  // Fetch organizer name
+  if (event.value.organizer) {
+    try {
+      const orgRes = await axios.get(`${API_URL}/api/users/${event.value.organizer}`)
+      event.value.organizerName = orgRes.data.fullName
+    } catch (e) {
+      event.value.organizerName = event.value.organizer
+    }
+  }
+
   await nextTick()
   applyTransform()
   loadGoogleMapsScript(() => {

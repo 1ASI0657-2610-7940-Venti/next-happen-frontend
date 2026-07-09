@@ -14,7 +14,10 @@ export const useAssignStandsStore = defineStore("assignStands", () => {
     loading.value = true
     try {
       const res = await http.get(`/api/events`)
-      events.value = res.data
+      const organizerId = localStorage.getItem('userId')
+      events.value = res.data.filter(
+        ev => ev.organizer === organizerId
+      )
     } catch (e) {
       events.value = []
     } finally { loading.value = false }

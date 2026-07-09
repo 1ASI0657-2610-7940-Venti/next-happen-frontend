@@ -81,6 +81,8 @@ async function toggleSave() {
       await axios.post(`${API_URL}/api/users/${userId}/saved-events/${eventId}`, {}, config)
       savedStore.addSaved(props.event)
       isSaved.value = true
+
+      await metricsApi.registerAction(eventId, "save")
     }
   } catch (err) {
     console.error('Error al guardar/quitar evento:', err)

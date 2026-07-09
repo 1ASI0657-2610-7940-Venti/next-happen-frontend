@@ -83,7 +83,11 @@ async function fetchEvents() {
     const res = await fetch(`${API}/api/events`)
     if (!res.ok) throw new Error("Error cargando eventos")
 
-    myEvents.value = await res.json()
+    const allEvents = await res.json()
+    const organizerId = localStorage.getItem('userId')
+    myEvents.value = allEvents.filter(
+      ev => ev.organizer === organizerId
+    )
   } catch (e) {
     console.error("Error cargando eventos:", e)
     myEvents.value = []
@@ -129,11 +133,11 @@ const eventMetrics = computed(() => {
 // Contadores
 // ================================================
 const eventViews = computed(() =>
-  eventMetrics.value.filter(m => m.action === 'view').length
+  eventMetrics.value.filter(m => m.action === 'view' || m.action === 'view-event').length
 )
 
 const eventSaves = computed(() =>
-  eventMetrics.value.filter(m => m.action === 'save').length
+  eventMetrics.value.filter(m => m.action === 'save' || m.action === 'saved-event').length
 )
 </script>
 
