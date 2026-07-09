@@ -291,9 +291,11 @@ const loadFairs = async () => {
 
       .map(ev => ({
         ...ev,
-        dates: ev.dateRange?.startDate && ev.dateRange?.endDate
-          ? [new Date(ev.dateRange.startDate), new Date(ev.dateRange.endDate)]
-          : []
+        dates: ev.startDate && ev.endDate
+          ? [new Date(ev.startDate), new Date(ev.endDate)]
+          : ev.dateRange?.startDate && ev.dateRange?.endDate
+            ? [new Date(ev.dateRange.startDate), new Date(ev.dateRange.endDate)]
+            : []
       }));
 
 
