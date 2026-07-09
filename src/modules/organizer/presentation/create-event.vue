@@ -330,7 +330,7 @@ const showAddressDialog = ref(false);
    Google Maps
 ===================================================== */
 let map, marker, geocoder;
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyA63CoEMd84d8bQBolX_gBrmksWBiev_vs";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 
 

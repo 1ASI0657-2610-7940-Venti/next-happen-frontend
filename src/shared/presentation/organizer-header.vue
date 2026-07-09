@@ -1,6 +1,6 @@
 <template>
   <header class="organizer-header">
-    <RouterLink class="organizer-logo" to="/">
+    <RouterLink class="organizer-logo" to="/org/dashboard">
       <div class="logo">
         <img src="@/shared/assets/Group.png" alt="NextHappen Logo" class="logo-img" />
       </div>
@@ -23,6 +23,14 @@
 
       <RouterLink to="/org/events">
         <pv-button icon="pi pi-calendar" class="options p-button-text" />
+      </RouterLink>
+
+      <RouterLink to="/org/sales" title="Ventas">
+        <pv-button icon="pi pi-dollar" class="options p-button-text" />
+      </RouterLink>
+
+      <RouterLink to="/org/validate" title="Validar entradas">
+        <pv-button icon="pi pi-qrcode" class="options p-button-text" />
       </RouterLink>
 
       <RouterLink to="/org/notifications">

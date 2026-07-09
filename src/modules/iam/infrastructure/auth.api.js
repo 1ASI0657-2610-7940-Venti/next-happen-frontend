@@ -1,11 +1,11 @@
-import axios from "axios";
+import http from "@/shared/infrastructure/http.js";
 
-const API_URL = import.meta.env.VITE_API_URL + "/api/auth";
+const AUTH_PATH = "/api/auth";
 
 export async function registerUserService(payload) {
-  return axios.post(`${API_URL}/register`, payload);
+  return http.post(`${AUTH_PATH}/register`, payload);
 }
 
 export async function loginUserService(payload) {
-  return axios.post(`${API_URL}/login`, payload);
+  return http.post(`${AUTH_PATH}/login`, payload);
 }

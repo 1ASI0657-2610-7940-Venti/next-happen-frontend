@@ -1,6 +1,6 @@
 <template>
   <header class="main-header">
-    <RouterLink to="/">
+    <RouterLink to="/user/home">
       <div class="logo">
         <img src="@/shared/assets/Group.png" alt="NextHappen Logo" class="logo-img" />
       </div>

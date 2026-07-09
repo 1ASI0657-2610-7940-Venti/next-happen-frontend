@@ -1,8 +1,4 @@
-import axios from 'axios'
+// Backward-compatible re-export of the shared axios instance.
+import http from './http.js'
 
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
-})
-
-export default api
-
+export default http

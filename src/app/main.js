@@ -9,8 +9,7 @@ import Material from '@primeuix/themes/material'
 // estilos
 import 'primeflex/primeflex.css'
 import 'primeicons/primeicons.css'
-import '@primeuix/themes/material'
-import 'leaflet/dist/leaflet.css'
+import '@/shared/assets/retro.css'
 import '@/shared/assets/style.css'
 
 // componentes
@@ -18,7 +17,7 @@ import Button from 'primevue/button'
 import Card from 'primevue/card'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import Dropdown from 'primevue/dropdown'
+import Select from 'primevue/select'
 import Avatar from 'primevue/avatar'
 import Menubar from 'primevue/menubar'
 import Toast from 'primevue/toast'
@@ -31,7 +30,7 @@ import DialogService from 'primevue/dialogservice'
 import ConfirmationService from 'primevue/confirmationservice'
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
-import Calendar from "primevue/calendar";
+import DatePicker from "primevue/datepicker";
 import InputNumber from "primevue/inputnumber";
 import CascadeSelect from "primevue/cascadeselect";
 import MultiSelect from 'primevue/multiselect'
@@ -46,12 +45,12 @@ createApp(App)
     .use(ConfirmationService)
     .component('pv-input-text', InputText)
     .component('pv-textarea', Textarea)
-    .component('pv-calendar', Calendar)
+    .component('pv-calendar', DatePicker)
     .component('pv-button', Button)
     .component('pv-card', Card)
     .component('pv-data-table', DataTable)
     .component('pv-column', Column)
-    .component('pv-dropdown', Dropdown)
+    .component('pv-dropdown', Select)
     .component('pv-avatar', Avatar)
     .component('pv-menubar', Menubar)
     .component('pv-toast', Toast)

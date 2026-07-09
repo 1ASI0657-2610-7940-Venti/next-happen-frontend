@@ -73,12 +73,18 @@
     <!-- ==== Botón de acción ==== -->
     <div class="actions">
       <pv-button
-        label="Comprar entrada"
+        :label="buying ? 'Redirigiendo a Stripe...' : 'Comprar entrada'"
         icon="pi pi-ticket"
         class="btn-buy"
+        :disabled="buying || !event.quantity"
         @click="buyTicket"
       />
     </div>
+
+    <p class="secure-note">🔒 Pago seguro procesado por Stripe.</p>
+
+    <!-- ==== Reseñas del evento ==== -->
+    <EventReviews :event-id="String(event.id)" />
   </div>
 </template>
 
@@ -86,14 +92,18 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import { PaymentsApi } from '@/modules/tickets/infrastructure/payments-api.js'
+import EventReviews from '@/modules/events/presentation/EventReviews.vue'
 
+const paymentsApi = new PaymentsApi()
+const buying = ref(false)
 const route = useRoute()
 const event = ref(null)
 const carousel = ref(null)
 let index = 0
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "AIzaSyA63CoEMd84d8bQBolX_gBrmksWBiev_vs";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 
 // ==== Tickets ====
@@ -216,23 +226,29 @@ function move(direction) {
 }
 
 async function buyTicket() {
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  if (!userId || !token) {
+    alert("Debes iniciar sesión para comprar.");
+    return;
+  }
+
+  buying.value = true;
   try {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      alert("Debes iniciar sesión para comprar.");
-      return;
-    }
-
-    const url = `${API_URL}/api/events/${event.value.id}/tickets/purchase?` +
-                `userId=${userId}&quantity=${ticketCount.value}`;
-
-    await axios.post(url);
-
-    alert(`Compra realizada con éxito. Total: S/. ${totalPrice.value.toFixed(2)}`);
+    // Crea la sesión de Stripe Checkout y redirige a la pasarela de pago.
+    // Las entradas SOLO se emiten cuando Stripe confirma el pago (webhook).
+    const { checkoutUrl } = await paymentsApi.createCheckout(
+      event.value.id,
+      ticketCount.value
+    );
+    window.location.href = checkoutUrl;
   } catch (error) {
-    console.error("Error al comprar entrada:", error);
-    alert("Ocurrió un error al procesar la compra.");
+    console.error("Error al iniciar el pago:", error);
+    const msg = error?.response?.data?.error ||
+      "Ocurrió un error al procesar la compra. Intenta de nuevo.";
+    alert(msg);
+    buying.value = false;
   }
 }
 </script>
@@ -240,6 +256,11 @@ async function buyTicket() {
 <style scoped>
 .title {
   text-align: center;
+  font-family: var(--r-font-display, 'Space Grotesk', sans-serif);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  text-wrap: balance;
 }
 
 /* ==== Carrusel con separación ==== */
@@ -337,6 +358,14 @@ async function buyTicket() {
   box-shadow: none;
 }
 
+.secure-note {
+  text-align: right;
+  padding-right: 20px;
+  margin-top: 8px;
+  color: #555;
+  font-size: 0.9rem;
+}
+
 .ticket-input {
   display: flex;
   align-items: center;
@@ -370,10 +399,19 @@ async function buyTicket() {
   box-shadow: none;
 }
 
+.ticket-section {
+  border: var(--r-bd, 2px solid #1b1a17);
+  box-shadow: var(--r-sh-2, 4px 4px 0 #1b1a17);
+  background: var(--r-surface-2, #fffbe8);
+  padding: 18px 20px;
+  margin-top: 24px;
+  max-width: 340px;
+}
 .total {
   margin-top: 1rem;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-family: var(--r-font-mono, 'Space Mono', monospace);
 }
 
 /* 📱 Responsivo */
