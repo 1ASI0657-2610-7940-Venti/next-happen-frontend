@@ -14,6 +14,15 @@ export class PaymentsApi {
         return data
     }
 
+    /**
+     * Confirma el pago al volver de Stripe (respaldo del webhook). Emite las entradas
+     * si el cobro se completó. Devuelve { status, quantity, paid }.
+     */
+    async confirmCheckout(sessionId) {
+        const { data } = await http.get('/api/payments/confirm', { params: { session_id: sessionId } })
+        return data
+    }
+
     /** Entradas del usuario (requiere sesión). */
     async getUserTickets(userId) {
         const { data } = await http.get(`/api/users/${userId}/tickets`)
